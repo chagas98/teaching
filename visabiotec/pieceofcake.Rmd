@@ -1,0 +1,227 @@
+---
+title: "PieceOfCake"
+author: "Samuel Chagas"
+date: "2022-10-30"
+output: rmdformats::material
+---
+
+# Configurações
+
+## Download R & RStudio
+
+Utilizaremos a linguagem R a partir da interface do RStudio. Para baixar ambos, acesse o tutorial disponível [em portugês](https://edisciplinas.usp.br/pluginfile.php/4883125/mod_resource/content/1/Tutorial.pdf) ou [em espanhol](http://www.upm.es/sfs/Rectorado/Gabinete%20del%20Rector/Notas%20de%20Prensa/2015/05/documentos/Instrucciones%20de%20instalaci%C3%B3n%20de%20R%20y%20RStudio.pdf).
+
+Caso sua preferência seja mais visual, é possível acompanhar um vídeo tutorial em [português](https://www.youtube.com/watch?v=6iZj3k9EBc4&t=441s&ab_channel=RLadiesBeloHorizonte) ou [espanhol](https://www.youtube.com/watch?v=D9Bp11iZssc&ab_channel=HanselOchoaMontero).
+
+## Primeiros Passos - Criando um *Script*
+
+A forma mais eficiente e prática de usar o R ou o RStudio é através de um *script*. Abra o arquivo pieceofcake.R, é um R Script executável. Agora, acompanhe as instruções abaixo (textos acompanhados por # são comentários e não são executáveis) utilizando seu *script* criado, aperte `Crtl+Enter` para executar alguma linha.
+
+**Criando  Objetos**
+
+```{r, results='hide'}
+
+# Digite o seguinte comando em seu script:
+x <- 2 #Variável numérica
+y <- 3 #Variável numérica
+z <- 5 #Variável numérico
+
+letra <- "a" #Variável caractér
+frase1  <- "Semana Acadêmica de Biotecnologia" #Variável string (conjunto de caracteres)
+frase2 <- "Semana Acadêmica de Biologia"
+
+# Posicione o cursor em cada linha digitada e pressione Control + Enter (comando de executar)
+# Observe na aba Console se o comando foi executado
+# Observe na aba "Environment" se os valores foram criados
+# Sim? Próximo passo.
+
+vetor1 <- c(x, y, z, x) #utilizando a função c() concatenar pra formar vetores
+vetor1
+
+vetor2 <- c(z, x, y, x) #utilizando a função c() concatenar pra formar vetores
+vetor2
+
+```
+
+**Usando Operadores**
+
+```{r, results='hide'}
+
+#Existem diferentes tipos de operadores, pressione Control + Enter em cada linha para executar cada comando e observe o resultado
+
+# (Alguns) Aritméticos
+x+y
+
+z/y
+
+vetor1*2
+
+# (Alguns) Relacionais
+
+x>y
+
+vetor1 <= x
+
+vetor1 == vetor2
+
+# (Alguns) Lógicos
+
+w <- c(TRUE,TRUE,FALSE,TRUE)
+k <- c(FALSE,TRUE,FALSE,FALSE)
+
+#AND 
+w&k
+
+#OR
+k|w
+
+```
+
+**Usando Funções**
+
+```{r, results='hide'}
+
+#Seleciona o maior valor
+max(vetor1)
+
+#Seleciona o menor valor
+min(vetor2)
+
+#Calcula a média
+mean(vetor1)
+
+#Calcula a mediana
+median(vetor1)
+
+#Calcula a média do vetor e multiplica por 2
+mean(vetor1)*2
+
+#Gera repetições
+rep(vetor1, 2)
+
+#Gerar uma amostra randômica a partir de um conjunto de valores
+sample(vetor1)
+```
+**Criando *Dataframes* e manipulando com *dplyr* **
+Na janela do console, digite: `install.packages("dplyr")`
+
+```{r, results='hide'}
+
+#Carregando biblioteca
+library(dplyr)
+
+#Piping
+x %>% sum(14) %>% sqrt() 
+
+#Configura alguns parâmetros para reprodução em diferentes computadores
+set.seed(001) 
+
+#Criando uma tabela
+tabela <- data.frame(num_palestra = rep(vetor1, 4),
+                     num_pessoas = rep(vetor2*10, 4),
+                     evento = sample(rep(c(frase1, frase2), 8)))
+
+tabela
+
+?data.frame
+?sample
+```
+
+# Analisando Dados COVID-19
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+## Bibliotecas
+
+```{r, include = FALSE}
+
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+
+```
+
+
+## Importando Dados
+
+Trabalharemos com Bancos de Dados Abertos do Governo [SIVEP-GRIPE](https://opendatasus.saude.gov.br/dataset/srag-2020) do OpenDATASUS. O dicionário dos dados pode ser acessado [aqui](https://opendatasus.saude.gov.br/dataset/srag-2020/resource/9f6ba348-0033-49b1-abbe-719a0ffbeb28)
+
+```{r}
+
+datacovid <- read.csv('2020_covid_datasus.csv', sep = ';')
+
+```
+
+
+```{r}
+
+#Coleta e seleção das variáveis de interesse
+covidselect <- datacovid %>% 
+  dplyr::select(DT_NOTIFIC, SG_UF_NOT, CS_SEXO, NU_IDADE_N, TP_IDADE, 
+         CS_RACA, CS_ESCOL_N, ID_MN_INTE , HOSPITAL, UTI, DT_ENTUTI, 
+         DT_SAIDUTI, SUPORT_VEN, DT_INTERNA, DT_EVOLUCA, AMOSTRA, EVOLUCAO, CLASSI_FIN)
+
+str(covidselect)
+
+```
+```{r}
+datacovid1 <-  covidselect %>% 
+  #Filtragem para casos COVID-19 de Foz do Iguaçu
+  dplyr::filter(ID_MN_INTE == 'FOZ DO IGUACU' & CLASSI_FIN == 5) %>%
+  #Filtragem de pacientes com idade igual ou superior a 18 anos
+  dplyr::filter(NU_IDADE_N >= 18 & TP_IDADE == 3) %>%
+  #calculando período na UTI e Renomeando valores
+  dplyr::mutate(PERIOD_UTI = as.Date(DT_SAIDUTI, "%d/%m/%Y") - as.Date(DT_ENTUTI, "%d/%m/%Y"),
+                PERIOD_HOSP = as.Date(DT_EVOLUCA, "%d/%m/%Y") - as.Date(DT_INTERNA, "%d/%m/%Y"),
+                UTI = case_when(UTI == 1 ~ "Sim",
+                                UTI == 2 ~ "Não"))
+
+
+ggplot2::ggplot(datacovid1, aes(x = CS_SEXO, y = NU_IDADE_N)) +
+  geom_boxplot() 
+```
+
+
+```{r}
+#Verificando Variáveis
+
+datacovid1 %>%
+   group_by(CS_SEXO, UTI) %>% 
+   summarise(n = n())
+
+```
+
+
+```{r}
+
+#Retiro Variáveis CS_SEXO = I
+datacovid2 <- datacovid1 %>% 
+  dplyr::filter(CS_SEXO != "I") %>% 
+  dplyr::mutate(CS_SEXO = case_when(CS_SEXO == "F" ~ "Mulheres",
+                                    CS_SEXO == "M" ~ "Homens"))
+
+
+ggplot2::ggplot(datacovid2, aes(x = CS_SEXO, y = NU_IDADE_N)) +
+  geom_boxplot() 
+
+```
+
+
+```{r}
+
+ggplot2::ggplot(datacovid2, aes(x = CS_SEXO, y = NU_IDADE_N)) +
+  #geometry1
+  geom_violin(aes(fill = UTI), trim = FALSE, position = position_dodge(0.9) ) +
+  #geometry2
+  geom_boxplot(aes(color = UTI), width = 0.15, position = position_dodge(0.9)) +
+  #Coordenadas
+  labs(x = "", y = "Idade (anos)") +
+  #Theme & Colors
+  scale_fill_manual(values = c("#00AFBB", "#E7B800")) +
+  scale_color_manual(values = c("black", "black")) +
+  theme_clean()
+
+```
