@@ -1168,8 +1168,10 @@ alguma linha.</p>
 </div>
 <div id="importando-dados" class="section level2">
 <h2>Importando Dados</h2>
-<p>Trabalharemos com Bancos de Dados Abertos do Governo <a href="https://opendatasus.saude.gov.br/dataset/srag-2020">SIVEP-GRIPE</a>
-do OpenDATASUS. O dicionário dos dados pode ser acessado <a href="https://opendatasus.saude.gov.br/dataset/srag-2020/resource/9f6ba348-0033-49b1-abbe-719a0ffbeb28">aqui</a></p>
+<p>Primeiramente, fazer download dos arquivos que estão <a href="https://github.com/chagas98/teaching">aqui</a>. Trabalharemos com
+Bancos de Dados Abertos do Governo <a href="https://opendatasus.saude.gov.br/dataset/srag-2020">SIVEP-GRIPE</a>
+do OpenDATASUS. O dicionário dos dados pode ser acessado <a href="https://opendatasus.saude.gov.br/dataset/srag-2020/resource/9f6ba348-0033-49b1-abbe-719a0ffbeb28">aqui</a>.
+Download do dataset do SIVEP-GRIPE e renomeie.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>datacovid <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&#39;2020_covid_datasus.csv&#39;</span>, <span class="at">sep =</span> <span class="st">&#39;;&#39;</span>)</span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Coleta e seleção das variáveis de interesse</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>covidselect <span class="ot">&lt;-</span> datacovid <span class="sc">%&gt;%</span> </span>

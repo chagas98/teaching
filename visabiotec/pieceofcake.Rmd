@@ -146,8 +146,8 @@ library(ggthemes)
 
 
 ## Importando Dados
-
-Trabalharemos com Bancos de Dados Abertos do Governo [SIVEP-GRIPE](https://opendatasus.saude.gov.br/dataset/srag-2020) do OpenDATASUS. O dicionário dos dados pode ser acessado [aqui](https://opendatasus.saude.gov.br/dataset/srag-2020/resource/9f6ba348-0033-49b1-abbe-719a0ffbeb28)
+Primeiramente, fazer download dos arquivos que estão [aqui](https://github.com/chagas98/teaching).
+Trabalharemos com Bancos de Dados Abertos do Governo [SIVEP-GRIPE](https://opendatasus.saude.gov.br/dataset/srag-2020) do OpenDATASUS. O dicionário dos dados pode ser acessado [aqui](https://opendatasus.saude.gov.br/dataset/srag-2020/resource/9f6ba348-0033-49b1-abbe-719a0ffbeb28). Download do dataset do SIVEP-GRIPE e renomeie. 
 
 ```{r}
 
