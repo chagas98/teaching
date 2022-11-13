@@ -1,9 +1,10 @@
-#Mais informações: https://chagas98.github.io/teaching/
+#Mais informações: https://chagas98.github.io/teaching/pieceofcake.html
+#Esse documento está disponível em: https://github.com/chagas98/teaching
 
 #######################
 ###DEFININDO OBJETOS###
 #######################
-rm(list=ls()) #zerar as váriaveis
+rm(list=ls()) #zerar as váriaveis, caos queira limpar as variáveis declaradas.
 
 # Digite o seguinte comando em seu script:
 x <- 2 #Variável numérica
@@ -87,13 +88,23 @@ sample(vetor1)
 ### DATAFRAME E DPLYR ###
 #########################
 
-# Na janela do console, digite: `install.packages("dplyr")`
+# Na janela do console, digite os seguintes comandos sem "#":
+#install.packages("dplyr")
+#install.packages("ggplot2")
+#install.packages("ggthemes")
 
 #Carregando biblioteca
 library(dplyr)
+library(ggplot2)
+library(ggthemes)
 
-#Piping
-x %>% sum(14) %>% sqrt()
+#Piping - carrega os valores de cada linha para linha seguinte, ou carrega o valor do lado esquerdo do pipe (%>%) pro lado direito.
+
+x %>% #Variável x
+  sum(14) %>%  #Soma 14 à variável x
+  sqrt() # realiza a raiz quadrada de 14+x
+#Resultado: como não temos nenhum objeto novo criado (<-), o resultado aparecerá no Console.
+
 
 #Configura alguns parâmetros para reprodução em diferentes computadores
 set.seed(001)
@@ -105,9 +116,13 @@ tabela <- data.frame(num_palestra = rep(vetor1, 4),
 
 tabela
 
+#No próximo comando, o resultado no Console, quais valores aparecem e qual coluna? A função dplyr::select() permite você selecionar determinadas colunas.
+
 tabela %>%
   dplyr::select(num_palestra)
 
+
+#Se executar esses comandos, aparecerãá a janela Help, no canto inferior direito, mostrando as funcionalidades de cada função.
 ?data.frame
 ?sample
 
@@ -115,43 +130,42 @@ tabela %>%
 ### ANÁLISE DADOS COVID ###
 ###########################
 
-#Não se esqueça do install.packages()
-
-library(ggplot2)
-library(ggthemes)
-
-#Importanto dados
-datacovid <- read.csv('2020_covid_datasus.csv', sep = ';')
+#Importando Dados
+datacovid <- read.csv('2020_covid_datasus.csv', sep = ',')
 
 
-#Coleta e seleção das variáveis de interesse
+#Coleta e seleção das variáveis/colunas de interesse
 covidselect <- datacovid %>%
-  dplyr::select(DT_NOTIFIC, SG_UF_NOT, CS_SEXO, NU_IDADE_N, TP_IDADE,
-                CS_RACA, CS_ESCOL_N, ID_MN_INTE , HOSPITAL, UTI, DT_ENTUTI,
-                DT_SAIDUTI, SUPORT_VEN, DT_INTERNA, DT_EVOLUCA, AMOSTRA, EVOLUCAO, CLASSI_FIN)
+  dplyr::select(CS_SEXO, NU_IDADE_N, TP_IDADE,
+                ID_MN_INTE, UTI, DT_ENTUTI,
+                DT_SAIDUTI, SUPORT_VEN, DT_INTERNA,
+                DT_EVOLUCA, CLASSI_FIN)
 
-str(covidselect)
+#Passaremos nossa tabela selecionada ao longo de um Pipe (%>%) que irá filtrar, modificar e criar novas variáveis.
 
-#Data wrangling
+
 datacovid1 <-  covidselect %>%
   #Filtragem para casos COVID-19 de Foz do Iguaçu
   dplyr::filter(ID_MN_INTE == 'FOZ DO IGUACU' & CLASSI_FIN == 5) %>%
   #Filtragem de pacientes com idade igual ou superior a 18 anos
   dplyr::filter(NU_IDADE_N >= 18 & TP_IDADE == 3) %>%
-  #calculando período na UTI e Renomeando valores
+  #calculando período na UTI, no Hopsital e Renomeando valores da UTI (Sim e Não)
   dplyr::mutate(PERIOD_UTI = as.Date(DT_SAIDUTI, "%d/%m/%Y") - as.Date(DT_ENTUTI, "%d/%m/%Y"),
                 PERIOD_HOSP = as.Date(DT_EVOLUCA, "%d/%m/%Y") - as.Date(DT_INTERNA, "%d/%m/%Y"),
+                #Quando a variável UTI é igual a 1, ela representa que o paciente passou pela UTI, então *Sim*
                 UTI = case_when(UTI == 1 ~ "Sim",
                                 UTI == 2 ~ "Não"))
 
-# PLOT 1
+
+#Gráfico Boxplot da variável Sexo e Idade
 ggplot2::ggplot(datacovid1, aes(x = CS_SEXO, y = NU_IDADE_N)) +
   geom_boxplot()
 
-#Sumário dos dados
+
+#Verificando Variáveis -  O Resultado aparecerá no Console
 datacovid1 %>%
-  dplyr::group_by(CS_SEXO, UTI) %>%
-  dplyr::summarise(n = n())
+  group_by(CS_SEXO, UTI) %>%
+  summarise(n = n())
 
 
 #Retiro Variáveis CS_SEXO = I
@@ -160,11 +174,12 @@ datacovid2 <- datacovid1 %>%
   dplyr::mutate(CS_SEXO = case_when(CS_SEXO == "F" ~ "Mulheres",
                                     CS_SEXO == "M" ~ "Homens"))
 
-
+#Gráfico 2
 ggplot2::ggplot(datacovid2, aes(x = CS_SEXO, y = NU_IDADE_N)) +
   geom_boxplot()
 
 
+#Gráfico Bonito
 ggplot2::ggplot(datacovid2, aes(x = CS_SEXO, y = NU_IDADE_N)) +
   #geometry1
   geom_violin(aes(fill = UTI), trim = FALSE, position = position_dodge(0.9) ) +
@@ -175,10 +190,10 @@ ggplot2::ggplot(datacovid2, aes(x = CS_SEXO, y = NU_IDADE_N)) +
   #Theme & Colors
   scale_fill_manual(values = c("#00AFBB", "#E7B800")) +
   scale_color_manual(values = c("black", "black")) +
-  theme_clean()
+  ggthemes::theme_clean()
 
 
-#Outras possibilidades
+#Outras possibilidades - Dashboards online.
 #https://schagas.shinyapps.io/MiVectorViz/
 #https://shiny.rstudio.com/gallery/
 
