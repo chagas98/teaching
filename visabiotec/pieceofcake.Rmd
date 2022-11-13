@@ -1,11 +1,14 @@
 ---
-title: "PieceOfCake: Workshop de Visualização de Dados em R (VI Semana Acadêmica de Biotecnologia - UNILA)"
+title: "Workshop de Visualização de Dados em R."
 author: "Samuel Chagas"
 date: "2022-11-13"
 output: rmdformats::material
 ---
 
 # Tutorial - Passos para Fazer em Casa
+
+Tutorial do Workshopo de Visualização de Dados em R preparado para VI Semana Acadêmica de Biotecnologia - UNILA
+
 
 ## Download R & RStudio
 
